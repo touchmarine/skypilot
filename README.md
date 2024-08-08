@@ -1,5 +1,21 @@
 ## What does this branch do
 
+Fix FluidStack and Cudo by using the newer API.
+
+### Cudo
+
+Cudo list_vm_machine_types returned only 404 not found, so this branch switched to a new list_vm_machine_types2 (cudo_compute>=0.2.0).
+
+Make sure to install cudo_compute>=0.2.0. Currently, it's only available from TestPyPI:
+
+```bash
+pip install -i https://test.pypi.org/simple/ cudo-compute
+```
+
+NOTE: This fix disables the `sky/provision/cudo/cudo_wrapper.py::vm_available` function which checks how many VMs are available before provisioning. This might be dangerous!
+
+### FluidStack
+
 Fluidstack released a new API with which SkyPilot didn't work anymore. This branch applies a pull request for the new API [1] on top of the latest released version (v0.6.1) [2].
 
 For the pull request to work, you must run `python -m sky.clouds.service_catalog.data_fetchers.fetch_fluidstack` and `mv fluidstack/vms.csv ~/.sky/catalogs/v5/fluidstack/`. Quick explainer:
@@ -14,6 +30,7 @@ which has the fluidstack catalog in incompatible format with the pull request
 
 1. https://github.com/skypilot-org/skypilot/pull/3799
 2. https://github.com/skypilot-org/skypilot/releases/tag/v0.6.1
+
 
 ---
 
