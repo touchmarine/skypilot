@@ -4,6 +4,7 @@ Usage:
     python fetch_cudo_cloud.py
 """
 
+from decimal import Decimal
 import json
 import os
 
@@ -48,10 +49,7 @@ def get_instance_type(machine_type, vcpu, mem, gpu):
 def machine_types(gpu_model, mem_gib, vcpu_count, gpu_count):
     try:
         api = cudo_api()
-        types = api.list_vm_machine_types(mem_gib,
-                                          vcpu_count,
-                                          gpu=gpu_count,
-                                          gpu_model=gpu_model)
+        types = api.list_vm_machine_types2()
         return types.to_dict()
     except cudo_compute.rest.ApiException as e:
         raise e
@@ -61,20 +59,26 @@ def update_prices():
     rows = []
     for spec in utils.machine_specs:
         mts = machine_types('', spec['mem'], spec['vcpu'], spec['gpu'])
-        for hc in mts['host_configs']:
-            if not utils.gpu_exists(hc['gpu_model']):
+        for mt in mts['machine_types']:
+            if not utils.gpu_exists(mt['gpu_model']):
                 continue
-            accelerator_name = utils.cudo_gpu_to_skypilot_gpu(hc['gpu_model'])
+            accelerator_name = utils.cudo_gpu_to_skypilot_gpu(mt['gpu_model'])
+            price = Decimal(mt['vcpu_price_hr']['value']) + Decimal(
+                mt['memory_gib_price_hr']['value']) + Decimal(
+                    mt['gpu_price_hr']['value']) + Decimal(
+                        mt['min_storage_gib_price_hr']['value']) + Decimal(
+                            mt['ipv4_price_hr']['value'])
+
             row = {
-                'instance_type': get_instance_type(hc['machine_type'],
+                'instance_type': get_instance_type(mt['machine_type'],
                                                    spec['vcpu'], spec['mem'],
                                                    spec['gpu']),
                 'accelerator_name': accelerator_name,
                 'accelerator_count': str(spec['gpu']) + '.0',
                 'vcpus': str(spec['vcpu']),
                 'memory_gib': str(spec['mem']),
-                'price': hc['total_price_hr']['value'],
-                'region': hc['data_center_id'],
+                'price': str(price),
+                'region': mt['data_center_id'],
                 'gpu_info': get_gpu_info(spec['gpu'], accelerator_name),
             }
             rows.append(row)

@@ -125,6 +125,9 @@ def list_instances():
 
 def vm_available(to_start_count, gpu_count, gpu_model, data_center_id, mem,
                  cpus):
+    # list_vm_machine_types doesn't work anymore as it seems CUDO is moving to
+    # a new api. Skip this check for now (dangerous).
+    return
     try:
         gpu_model = utils.skypilot_gpu_to_cudo_gpu(gpu_model)
         api = cudo.cudo.cudo_api.virtual_machines()
