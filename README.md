@@ -1,3 +1,22 @@
+## What does this branch do
+
+Fluidstack released a new API with which SkyPilot didn't work anymore. This branch applies a pull request for the new API [1] on top of the latest released version (v0.6.1) [2].
+
+For the pull request to work, you must run `python -m sky.clouds.service_catalog.data_fetchers.fetch_fluidstack` and `mv fluidstack/vms.csv ~/.sky/catalogs/v5/fluidstack/`. Quick explainer:
+```
+entry
+    sky/clouds/service_catalog/fluidstack_catalog.py::_df
+calls
+    sky/clouds/service_catalog/common.py::read_catalog 
+which downloads the catalog from skypilot-org/skypilot-catalog
+which has the fluidstack catalog in incompatible format with the pull request
+```
+
+1. https://github.com/skypilot-org/skypilot/pull/3799
+2. https://github.com/skypilot-org/skypilot/releases/tag/v0.6.1
+
+---
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/skypilot-org/skypilot/master/docs/source/images/skypilot-wide-dark-1k.png">
