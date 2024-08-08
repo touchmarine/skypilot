@@ -4,15 +4,17 @@ Fix FluidStack and Cudo by using the newer API.
 
 ### Cudo
 
-Cudo list_vm_machine_types returned only 404 not found, so this branch switched to a new list_vm_machine_types2 (cudo_compute>=0.2.0).
+Every time I wanted to provision a cudo resource, sky returned a 404 not found error. It seems that Cudo just switched to a new API (or at least partially).
 
-Make sure to install cudo_compute>=0.2.0. Currently, it's only available from TestPyPI:
+The function returning 404 errors was `list_vm_machine_types`. This branch substitutes it for `list_vm_machine_types2`. The new function is present in cudo_compute versions >=0.2.0 (currently only available on TestPyPI).
 
 ```bash
 pip install -i https://test.pypi.org/simple/ cudo-compute
 ```
 
-NOTE: This fix disables the `sky/provision/cudo/cudo_wrapper.py::vm_available` function which checks how many VMs are available before provisioning. This might be dangerous!
+NOTE: This fix disables a check of how many VMs are available before provisioning [2]. This might be dangerous!
+
+2. `sky/provision/cudo/cudo_wrapper.py::vm_available`
 
 ### FluidStack
 
